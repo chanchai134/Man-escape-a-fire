@@ -9,6 +9,7 @@ public class WorldGame {
 		this.player = new Player(game);
 	}
 	public void update() {
+		player.update();
 	}
 	public void render() {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
