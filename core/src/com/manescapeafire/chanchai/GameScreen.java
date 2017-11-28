@@ -7,9 +7,10 @@ public class GameScreen extends ScreenAdapter{
 	private WorldGame world;
 	public GameScreen(GameFireMan game) {
 		this.game = game;
-		this.world = new WorldGame();
+		this.world = new WorldGame(game);
 	}
 	private void update(float delta) {
+		world.update();
     }
     public void render(float delta) {
 		game.batch.begin();
