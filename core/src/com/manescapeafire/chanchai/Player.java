@@ -22,8 +22,14 @@ public class Player {
 		 if(Gdx.input.isKeyPressed(Keys.LEFT) && pos.x > 0) {
 			 pos.x -= SPEED;
 		 }
+		 if(Gdx.input.isKeyPressed(Keys.UP)) {
+			 jump();
+		 }
 	}
 	public void render() {
 		game.batch.draw(img, pos.x, pos.y);
+	}
+	public void jump() {
+		pos.y += 5;
 	}
 }

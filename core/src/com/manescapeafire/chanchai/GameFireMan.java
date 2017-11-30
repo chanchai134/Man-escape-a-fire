@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class GameFireMan extends Game {
 	public SpriteBatch batch;
 	public static final int HEIGHT = 900;
-	public static final int WIDTH = 700;
+	public static final int WIDTH = 750;
 	
 	@Override
 	public void create () {
