@@ -14,14 +14,19 @@ public class Player {
 	private final int RIGHT = 1;
 	private final float SPEED = 5f;
 	private final float GRAVITY = -1;
-	private final float JUMPFORCE = 5; //U set on jump
+	private final float JUMPFORCE = 15; //U set on jump
 	private float Upresent;
-	private float lower;
-	private float uppder;
-	public Player(GameFireMan game, float x, float y) {
+	private float Ubefore;
+	private Box [][]box;
+	private boolean startJump;
+	private boolean isJump;
+	public Player(GameFireMan game, float x, float y, Box [][]box) {
 		this.game = game;
+		this.box = box;
 		setStatus(0);
 		setUpresent(0);
+		setUbefore(0);
+		isJump = false;
 		pos = new Vector2(x, y);
 		img[0] = new Texture("player_stand_R.png");
 		img[1] = new Texture("player_stand_L.png");
@@ -31,28 +36,77 @@ public class Player {
 	public void update() {
 		//if(Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
 		if(Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			setStatus(0);
+			if(!isJump) {
+				setStatus(0);
+			}
+			else {
+				setStatus(4);
+			}
 			walk(RIGHT);
 		}
 		if(Gdx.input.isKeyPressed(Keys.LEFT)) {
-			setStatus(1);
+			if(!isJump) {
+				setStatus(1);
+			}
+			else {
+				setStatus(5);
+			}
 			walk(LEFT);
 		}
-		if(Gdx.input.isKeyPressed(Keys.UP)) {
-			setStatus(4);
+		if(Gdx.input.isKeyJustPressed(Keys.UP) && !isJump) {
+			System.out.println("start");
+			if(getStatus() == 0) {
+				setStatus(4);
+			}
+			else if(getStatus() == 1) {
+				setStatus(5);
+			}			
 			jump();
+			startJump = true;
 		}
 		 ////////////auto update
-		if(pos.x > (GameFireMan.WIDTH-Box.WIDTH))
-		{
+		if(pos.x > (GameFireMan.WIDTH-Box.WIDTH)) {
 			pos.x = (GameFireMan.WIDTH-Box.WIDTH);
 		}
-		if(pos.x < 0)
-		{
+		if(pos.x < 0) {
 			pos.x = 0;
 		}
-		//pos.y += getUpresent();
-		setUpresent(getUpresent()+GRAVITY);
+		for(int i = 0; i < box.length; i++) {
+			for(int j = 0; j < box[i].length; j++) {
+				if(box[i][j] != null) {
+					isJump = true;
+					if(box[i][j].getStatePlayer() == 'h' && Ubefore < 0 && pos.y < box[i][j].getUpper() && getUpresent() < 0) {
+						pos.y = box[i][j].getUpper();
+						System.out.println("end");
+					}
+					if(pos.y < box[i][j].getUpper()) {
+						box[i][j].setStatePlayer('l');
+					}
+					else if(pos.y == box[i][j].getUpper()) {
+						box[i][j].setStatePlayer('o');
+						isJump = false;
+					}
+					else {
+						box[i][j].setStatePlayer('h');
+					}
+					if(pos.y == box[i][j].getUpper() && !startJump) {
+						if(status == 4) {
+							setStatus(0);
+						}
+						if(status == 5) {
+							setStatus(1);
+						}
+					}
+				}
+			}
+		}
+		if(status == 4 || status == 5) {
+			pos.y += getUpresent();
+			setUbefore(getUpresent());
+			setUpresent(getUpresent()+GRAVITY);
+		}
+		startJump = false;
+		System.out.println(isJump);
 	}
 	public void render() {
 		game.batch.draw(img[getStatus()], pos.x, pos.y);
@@ -76,17 +130,10 @@ public class Player {
 	public void setUpresent(float upresent) {
 		Upresent = upresent;
 	}
-	public float getLower() {
-		return lower;
+	public float getUbefore() {
+		return Ubefore;
 	}
-	public void setLower(float lower) {
-		this.lower = lower;
+	public void setUbefore(float ubefore) {
+		Ubefore = ubefore;
 	}
-	public float getUppder() {
-		return uppder;
-	}
-	public void setUppder(float uppder) {
-		this.uppder = uppder;
-	}
-
 }

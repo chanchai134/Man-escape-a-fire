@@ -7,7 +7,7 @@ public class WorldGame {
 	private Player player;
 	private Box [][]box = new Box[24][10];//[y][x]
 	public WorldGame(GameFireMan game) {
-		player = new Player(game, 0, Box.HEIGH);
+		player = new Player(game, 0, Box.HEIGH, box);
 		for(int i = 0 ;i<10 ;i++) {
 			box[0][i] = new Box(game, Box.WIDTH*i, 0);
 		}
@@ -22,6 +22,5 @@ public class WorldGame {
 			box[0][i].render();
 		}
 		player.render();
-	}
-	
+	}	
 }
