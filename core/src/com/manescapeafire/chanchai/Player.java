@@ -14,19 +14,20 @@ public class Player {
 	private final int RIGHT = 1;
 	private final float SPEED = 5f;
 	private final float GRAVITY = -1;
-	private final float JUMPFORCE = 15; //U set on jump
+	private final float JUMPFORCE = 15.1f; //U set on jump
 	private float Upresent;
 	private float Ubefore;
 	private Box [][]box;
 	private boolean startJump;
-	private boolean isJump;
+	private boolean isOnAir;
 	public Player(GameFireMan game, float x, float y, Box [][]box) {
 		this.game = game;
 		this.box = box;
 		setStatus(0);
 		setUpresent(0);
 		setUbefore(0);
-		isJump = false;
+		isOnAir = false;
+		startJump = false;
 		pos = new Vector2(x, y);
 		img[0] = new Texture("player_stand_R.png");
 		img[1] = new Texture("player_stand_L.png");
@@ -36,7 +37,7 @@ public class Player {
 	public void update() {
 		//if(Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
 		if(Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			if(!isJump) {
+			if(!isOnAir) {
 				setStatus(0);
 			}
 			else {
@@ -45,7 +46,7 @@ public class Player {
 			walk(RIGHT);
 		}
 		if(Gdx.input.isKeyPressed(Keys.LEFT)) {
-			if(!isJump) {
+			if(!isOnAir) {
 				setStatus(1);
 			}
 			else {
@@ -53,7 +54,7 @@ public class Player {
 			}
 			walk(LEFT);
 		}
-		if(Gdx.input.isKeyJustPressed(Keys.UP) && !isJump) {
+		if(Gdx.input.isKeyJustPressed(Keys.UP) && !isOnAir) {
 			System.out.println("start");
 			if(getStatus() == 0) {
 				setStatus(4);
@@ -71,42 +72,44 @@ public class Player {
 		if(pos.x < 0) {
 			pos.x = 0;
 		}
+		isOnAir = true; //wait for checking hits a ground to turn False
+		boolean checkXInRange;
 		for(int i = 0; i < box.length; i++) {
 			for(int j = 0; j < box[i].length; j++) {
 				if(box[i][j] != null) {
-					isJump = true;
-					if(box[i][j].getStatePlayer() == 'h' && Ubefore < 0 && pos.y < box[i][j].getUpper() && getUpresent() < 0) {
+					checkXInRange = box[i][j].xInRange(pos);
+					if(box[i][j].getStatePlayer() == 'h' && Ubefore < 0 && pos.y < box[i][j].getUpper() && getUpresent() < 0 && checkXInRange) {
 						pos.y = box[i][j].getUpper();
 						System.out.println("end");
 					}
 					if(pos.y < box[i][j].getUpper()) {
 						box[i][j].setStatePlayer('l');
 					}
-					else if(pos.y == box[i][j].getUpper()) {
+					else if(pos.y == box[i][j].getUpper() && !startJump && checkXInRange) {
 						box[i][j].setStatePlayer('o');
-						isJump = false;
-					}
-					else {
-						box[i][j].setStatePlayer('h');
-					}
-					if(pos.y == box[i][j].getUpper() && !startJump) {
+						isOnAir = false;
 						if(status == 4) {
 							setStatus(0);
 						}
 						if(status == 5) {
 							setStatus(1);
 						}
+						setUpresent(0);
+						setUbefore(0);
+					}
+					else {
+						box[i][j].setStatePlayer('h');
 					}
 				}
 			}
 		}
-		if(status == 4 || status == 5) {
+		if(isOnAir) {
 			pos.y += getUpresent();
 			setUbefore(getUpresent());
 			setUpresent(getUpresent()+GRAVITY);
 		}
 		startJump = false;
-		System.out.println(isJump);
+		System.out.println(isOnAir);
 	}
 	public void render() {
 		game.batch.draw(img[getStatus()], pos.x, pos.y);
