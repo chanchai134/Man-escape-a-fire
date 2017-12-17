@@ -1,7 +1,6 @@
 package com.manescapeafire.chanchai;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -10,12 +9,12 @@ import com.badlogic.gdx.utils.Array;
 
 public class Player {
 	private Vector2 pos;
-	private Texture []img = new Texture[10];//0standR 1stanL 234walR 567walkL 8jumpR 9jumpL
-	private int status;
+	private Texture []img = new Texture[4];//0standR 1stanL 2jumpR 3jumpL
+	private int status; //use for show texture;
 	private static final int WIDTH = 72;
 	private final int LEFT = -1;
 	private final int RIGHT = 1;
-	private float SPEED = 5;
+	private float speed = 5;
 	private final float GRAVITY = -1;
 	private float JUMPFORCE = 15; //U set on jump
 	private float Upresent;
@@ -37,16 +36,20 @@ public class Player {
 		isOnAir = false;
 		startJump = false;
 		pos = new Vector2(x, y);
-		img[0] = new Texture("player_stand_R.png");
-		img[1] = new Texture("player_stand_L.png");
-		img[2] = new Texture("player_jump_R.png");
-		img[3] = new Texture("player_jump_L.png");
+		/////////////import all texture
+		imageLoad();
 		TextureAtlas runningR = new TextureAtlas(Gdx.files.internal("walkR.atlas"));
         Array<TextureAtlas.AtlasRegion> runningFramesR = runningR.findRegions("walkR");
         runningAnimationR = new Animation(FRAME_DURATION, runningFramesR, Animation.PlayMode.LOOP);
         TextureAtlas runningL = new TextureAtlas(Gdx.files.internal("walkL.atlas"));
         Array<TextureAtlas.AtlasRegion> runningFramesL = runningL.findRegions("walkL");
         runningAnimationL = new Animation(FRAME_DURATION, runningFramesL, Animation.PlayMode.LOOP);	
+	}
+	private void imageLoad() {
+		img[0] = new Texture("player_stand_R.png");
+		img[1] = new Texture("player_stand_L.png");
+		img[2] = new Texture("player_jump_R.png");
+		img[3] = new Texture("player_jump_L.png");
 	}
 	public void update() {
 		updateWithKeyboard();
@@ -165,7 +168,7 @@ public class Player {
 		//System.out.println(isOnAir);
 	}
 	public void move(int direction) {
-		pos.x += SPEED*direction;
+		pos.x += speed*direction;
 	}
 	public void jump() {
 		setUpresent(JUMPFORCE);
@@ -199,11 +202,11 @@ public class Player {
 		}
 		return false;
 	}
-	public float getSPEED() {
-		return SPEED;
+	public float getSpeed() {
+		return speed;
 	}
-	public void setSPEED(float sPEED) {
-		SPEED = sPEED;
+	public void setSpeed(float speed) {
+		this.speed = speed;
 	}
 	public float getJUMPFORCE() {
 		return JUMPFORCE;

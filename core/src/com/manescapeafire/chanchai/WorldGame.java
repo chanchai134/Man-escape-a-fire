@@ -56,6 +56,9 @@ public class WorldGame {
 				status = 1;
 			}
 		}
+		autoUpdate();
+	}
+	private void autoUpdate() {
 		clearScreenAndRegenerate();
 		if(player.isGameOver()) {
 			status = 2;
@@ -63,7 +66,7 @@ public class WorldGame {
 		else {
 			SPEEDSCROLL += delta/40;
 			score+=(SPEEDSCROLL/2);
-			player.setSPEED(player.getSPEED()+delta/40);
+			player.setSpeed(player.getSpeed()+delta/40);
 			player.setJUMPFORCE(player.getJUMPFORCE()+delta/10);
 		}
 	}
@@ -84,19 +87,25 @@ public class WorldGame {
 		}
 	}
 	private void screenScroll() {
+		scrollAllBox(SPEEDSCROLL);
+		scrollAllWall(SPEEDSCROLL);
+		player.screenScroll(SPEEDSCROLL);
+	}
+	private void scrollAllWall(float speed) {
+		for(int i = 0; i < 6; i++) {
+			for (int j = 0; j < 4 ; j++) {
+				wall[i][j].screenScroll(speed);
+			}
+		}
+	}
+	private void scrollAllBox(float speed) {
 		for(int i = 0 ;i<13 ;i++) {
 			for(int j = 0; j < 10;j++) {
 				if(box[i][j] != null) {
-					box[i][j].screenScroll(SPEEDSCROLL);
+					box[i][j].screenScroll(speed);
 				}
 			}
 		}
-		for(int i = 0; i < 6; i++) {
-			for (int j = 0; j < 4 ; j++) {
-				wall[i][j].screenScroll(SPEEDSCROLL);
-			}
-		}
-		player.screenScroll(SPEEDSCROLL);
 	}
 	private void clearScreenAndRegenerate() {
 		float yOfBox = 0;
@@ -143,13 +152,6 @@ public class WorldGame {
 			}
 		}
 	}
-	private void generateWall() {
-		for(int i = 0; i < 6; i++) {
-			for (int j = 0; j < 4 ; j++) {
-				wall[i][j] = new Wall(this, j*Wall.WIDTH, i*Wall.HEIGH);
-			}
-		}
-	}
 	private void boxRender() {
 		for(int i = 0 ;i<13 ;i++) {
 			for(int j = 0; j < 10;j++) {
@@ -163,6 +165,13 @@ public class WorldGame {
 		for(int i = 0; i < 6; i++) {
 			for (int j = 0; j < 4 ; j++) {
 				wall[i][j].render();
+			}
+		}
+	}
+	private void generateWall() {
+		for(int i = 0; i < 6; i++) {
+			for (int j = 0; j < 4 ; j++) {
+				wall[i][j] = new Wall(this, j*Wall.WIDTH, i*Wall.HEIGH);
 			}
 		}
 	}
@@ -230,8 +239,5 @@ public class WorldGame {
 	}
 	public void setDelta(float delta) {
 		this.delta = delta;
-	}
-	public float getDelta() {
-		return delta;
 	}
 }

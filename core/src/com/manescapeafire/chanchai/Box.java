@@ -1,28 +1,21 @@
 package com.manescapeafire.chanchai;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Vector2;
 
-public class Box {
-	private Vector2 pos;
-	private Texture img;
+public class Box extends Wall{
 	public static final int WIDTH = 75;
 	public static final int HEIGH = 40;
 	private float upper;
 	private char statePlayer;//l = lower , h = higher ,o = on the floor//Player is lower than box. 
-	private WorldGame world;
 	public Box(WorldGame world, float x, float y) {
-		this.world = world;
+		super(world,x,y);
 		this.statePlayer = 'l';
-		pos = new Vector2(x,y);
 		img = new Texture("ground.png");
 		upper = y+HEIGH;
 	}
-	public void render() {
-		world.game.batch.draw(img, pos.x, pos.y);
-	}
+	@Override
 	public void screenScroll(float speed) {
-		pos.y -= speed;
+		super.screenScroll(speed);
 		upper = pos.y+HEIGH;
 	}
 	public boolean xInRange(float x) {
@@ -39,8 +32,5 @@ public class Box {
 	}
 	public void setStatePlayer(char statePlayer) {
 		this.statePlayer = statePlayer;
-	}
-	public float getY() {
-		return pos.y;
 	}
 }

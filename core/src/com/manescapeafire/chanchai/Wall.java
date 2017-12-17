@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 public class Wall {
-	private Vector2 pos;
-	private Texture img;
+	protected Vector2 pos;
+	protected Texture img;
 	public static final int WIDTH = 225;
 	public static final int HEIGH = 225;
 	private WorldGame world;
