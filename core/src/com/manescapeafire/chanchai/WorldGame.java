@@ -1,7 +1,6 @@
 package com.manescapeafire.chanchai;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public class WorldGame {
 	private Player player;
@@ -10,8 +9,11 @@ public class WorldGame {
 	private float SPEEDSCROLL = 1;
 	private int nextIndexChangeBox = 0;
 	private int nextIndexChangeWall = 0;
+	private BitmapFont scoreText = new BitmapFont();
 	private Fire fire;
+	private float score = 0;
 	private Wall [][]wall = new Wall[6][4];
+	private float delta;
 	public WorldGame(GameFireMan game) {
 		this.game = game;
 		player = new Player(this, (GameFireMan.WIDTH-Player.getWidth())/2, Box.HEIGH*9);
@@ -22,30 +24,29 @@ public class WorldGame {
 				wall[i][j] = new Wall(this, j*Wall.WIDTH, i*Wall.HEIGH);
 			}
 		}
+		scoreText.setColor(0, 0, 0, 1);
+		scoreText.getData().setScale(1.5f);
 	}
 	public void update() {
 		player.update();
 		screenScroll();
 		clearScreenAndRegenerate();
+		if(player.isGameOver()) {
+			System.out.println("gameover");
+		}
+		else {
+			SPEEDSCROLL += delta/40;
+			score+=(SPEEDSCROLL/2);
+			player.setSPEED(player.getSPEED()+delta/40);
+			player.setJUMPFORCE(player.getJUMPFORCE()+delta/10);
+		}		
 	}
 	public void render() {
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		for(int i = 0; i < 6; i++) {
-			for (int j = 0; j < 4 ; j++) {
-				wall[i][j].render();
-			}
-		}
-		for(int i = 0 ;i<13 ;i++) {
-			for(int j = 0; j < 10;j++) {
-				if(box[i][j] != null) {
-					box[i][j].render();
-				}
-			}
-		}
-		wall[0][0].render();
+		wallRender();
+		boxRender();
 		player.render();
 		fire.render();
+		scoreText.draw(game.batch, "Score : "+String.format("%.0f", score), 595, 40);
 	}
 	private void screenScroll() {
 		for(int i = 0 ;i<13 ;i++) {
@@ -104,6 +105,22 @@ public class WorldGame {
 				else {
 					nextIndexChangeWall += 1;
 				}
+			}
+		}
+	}
+	private void boxRender() {
+		for(int i = 0 ;i<13 ;i++) {
+			for(int j = 0; j < 10;j++) {
+				if(box[i][j] != null) {
+					box[i][j].render();
+				}
+			}
+		}
+	}
+	private void wallRender() {
+		for(int i = 0; i < 6; i++) {
+			for (int j = 0; j < 4 ; j++) {
+				wall[i][j].render();
 			}
 		}
 	}
@@ -168,5 +185,8 @@ public class WorldGame {
 	}
 	public Box[][] getBox() {
 		return box;
+	}
+	public void setDelta(float delta) {
+		this.delta = delta;
 	}
 }

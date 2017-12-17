@@ -12,14 +12,15 @@ public class Player {
 	private static final int WIDTH = 72;
 	private final int LEFT = -1;
 	private final int RIGHT = 1;
-	private final float SPEED = 5;
+	private float SPEED = 5;
 	private final float GRAVITY = -1;
-	private final float JUMPFORCE = 15; //U set on jump
+	private float JUMPFORCE = 15; //U set on jump
 	private float Upresent;
 	private float Ubefore;
 	private boolean startJump;
 	private boolean isOnAir;
 	private WorldGame world;
+	private boolean isGameEnd = false;
 	public Player(WorldGame world, float x, float y) {
 		this.world = world;
 		setStatus(0);
@@ -62,8 +63,8 @@ public class Player {
 			}
 			walk(LEFT);
 		}
-		if(Gdx.input.isKeyJustPressed(Keys.UP) && !isOnAir) {
-			System.out.println("start");
+		if(Gdx.input.isKeyJustPressed(Keys.UP) && !isOnAir && !isGameEnd) {
+			//System.out.println("start");
 			if(getStatus() == 0) {
 				setStatus(4);
 			}
@@ -89,10 +90,16 @@ public class Player {
 					checkXInRange = world.getBox()[i][j].xInRange(pos.x+(WIDTH/2));
 					if(world.getBox()[i][j].getStatePlayer() == 'h' && Ubefore < 0 && pos.y < world.getBox()[i][j].getUpper() && getUpresent() < 0 && checkXInRange) {
 						pos.y = world.getBox()[i][j].getUpper();
-						System.out.println("end");
+						//System.out.println("end");
 					}
 					if(pos.y < world.getBox()[i][j].getUpper()) {
-						world.getBox()[i][j].setStatePlayer('l');
+						if(world.getBox()[i][j].getUpper() - pos.y <= 0.001 && !startJump && checkXInRange) {
+							pos.y = world.getBox()[i][j].getUpper();
+							isOnAir = false;
+						}
+						else {
+							world.getBox()[i][j].setStatePlayer('l');
+						}
 					}
 					else if(pos.y == world.getBox()[i][j].getUpper() && !startJump && checkXInRange) {
 						world.getBox()[i][j].setStatePlayer('o');
@@ -147,5 +154,24 @@ public class Player {
 	}
 	public static int getWidth() {
 		return WIDTH;
+	}
+	public boolean isGameOver() {
+		if(pos.y < 40) {
+			isGameEnd = true;
+			return true;
+		}
+		return false;
+	}
+	public float getSPEED() {
+		return SPEED;
+	}
+	public void setSPEED(float sPEED) {
+		SPEED = sPEED;
+	}
+	public float getJUMPFORCE() {
+		return JUMPFORCE;
+	}
+	public void setJUMPFORCE(float jUMPFORCE) {
+		JUMPFORCE = jUMPFORCE;
 	}
 }
