@@ -21,8 +21,8 @@ public class Box {
 	public void render() {
 		game.batch.draw(img, pos.x, pos.y);
 	}
-	public boolean xInRange(Vector2 position) {
-		if((pos.x-WIDTH/2) <= position.x && position.x < (pos.x+WIDTH/2)) {
+	public boolean xInRange(float x) {
+		if(pos.x <= x && x < (pos.x+WIDTH)) {
 			return true;
 		}
 		return false;
@@ -35,5 +35,8 @@ public class Box {
 	}
 	public void setStatePlayer(char statePlayer) {
 		this.statePlayer = statePlayer;
+	}
+	public float getY() {
+		return pos.y;
 	}
 }

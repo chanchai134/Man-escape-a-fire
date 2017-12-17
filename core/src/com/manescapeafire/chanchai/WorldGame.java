@@ -5,22 +5,21 @@ import com.badlogic.gdx.graphics.GL20;
 
 public class WorldGame {
 	private Player player;
-	private Box [][]box = new Box[24][10];//[y][x]
+	private Box [][]box = new Box[13][10];//[y][x]
+	private GameFireMan game;
 	public WorldGame(GameFireMan game) {
-		player = new Player(game, 0, Box.HEIGH, box);
-		for(int i = 0 ;i<10 ;i++) {
-			box[0][i] = new Box(game, Box.WIDTH*i, 0);
+		this.game = game;
+		player = new Player(game, (GameFireMan.WIDTH-Player.getWidth())/2, Box.HEIGH*5, box);
+		/////////////////////////////////////////
+		for(int j = 0; j<10; j++) {
+			box[0][j] = new Box(game, Box.WIDTH*j, 0);
 		}
-		box[2][5] = new Box(game, Box.WIDTH*5, Box.HEIGH*2);
-		box[3][3] = new Box(game, Box.WIDTH*3, Box.HEIGH*3);
-		box[4][4] = new Box(game, Box.WIDTH*4, Box.HEIGH*4);
-		box[5][6] = new Box(game, Box.WIDTH*6, Box.HEIGH*5);
-		box[6][7] = new Box(game, Box.WIDTH*7, Box.HEIGH*6);
-		box[7][4] = new Box(game, Box.WIDTH*4, Box.HEIGH*7);
-		box[8][6] = new Box(game, Box.WIDTH*6, Box.HEIGH*8);
-		box[9][9] = new Box(game, Box.WIDTH*9, Box.HEIGH*9);
-		box[10][3] = new Box(game, Box.WIDTH*3, Box.HEIGH*10);
-		box[11][1] = new Box(game, Box.WIDTH*1, Box.HEIGH*11);
+		for(int i = 1; i<13; i++) {
+			box[i] = generateBox(box[i-1]);
+		}
+		box[2][4] = new Box(game, Box.WIDTH*4, Box.HEIGH*2*2);
+		box[2][5] = new Box(game, Box.WIDTH*5, Box.HEIGH*2*2);
+		/////////////////////////////////////////////
 	}
 	public void update() {
 		player.update();
@@ -28,7 +27,7 @@ public class WorldGame {
 	public void render() {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		for(int i = 0 ;i<24 ;i++) {
+		for(int i = 0 ;i<13 ;i++) {
 			for(int j = 0; j < 10;j++) {
 				if(box[i][j] != null) {
 					box[i][j].render();
@@ -36,5 +35,30 @@ public class WorldGame {
 			}
 		}
 		player.render();
-	}	
+	}
+	public Box[] generateBox(Box[] down) {
+		Box[] next = new Box[10];
+		boolean haveOne = false;
+		for(int i = 0; i<10; i++) {
+			if(down[i] != null) {
+				float y = down[i].getY();
+				int temp = i-2;
+				for(int j = 0; j<5; j++) {
+					if(temp+j >= 0 && temp+j <= 9 && Math.random() < 0.2) {
+						next[temp+j] = new Box(game, Box.WIDTH*(temp+j), y+Box.HEIGH*2);
+						haveOne = true;
+					}
+				}
+				while(!haveOne) {
+					for(int j = 0; j<5; j++) {
+						if(temp+j >= 0 && temp+j <= 9 && Math.random() < 0.2) {
+							next[temp+j] = new Box(game, Box.WIDTH*(temp+j), y+Box.HEIGH*2);
+							haveOne = true;
+						}
+					}
+				}
+			}
+		}
+		return next;
+	}
 }

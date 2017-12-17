@@ -10,6 +10,7 @@ public class Player {
 	private Vector2 pos;
 	private Texture []img = new Texture[6];//0standR 1stanL 2walR 3walkL 4jumpR 5jumpL
 	private int status;
+	private static final int WIDTH = 72;
 	private final int LEFT = -1;
 	private final int RIGHT = 1;
 	private final float SPEED = 5f;
@@ -77,7 +78,7 @@ public class Player {
 		for(int i = 0; i < box.length; i++) {
 			for(int j = 0; j < box[i].length; j++) {
 				if(box[i][j] != null) {
-					checkXInRange = box[i][j].xInRange(pos);
+					checkXInRange = box[i][j].xInRange(pos.x+(WIDTH/2));
 					if(box[i][j].getStatePlayer() == 'h' && Ubefore < 0 && pos.y < box[i][j].getUpper() && getUpresent() < 0 && checkXInRange) {
 						pos.y = box[i][j].getUpper();
 						System.out.println("end");
@@ -109,7 +110,7 @@ public class Player {
 			setUpresent(getUpresent()+GRAVITY);
 		}
 		startJump = false;
-		System.out.println(isOnAir);
+		//System.out.println(isOnAir);
 	}
 	public void render() {
 		game.batch.draw(img[getStatus()], pos.x, pos.y);
@@ -138,5 +139,8 @@ public class Player {
 	}
 	public void setUbefore(float ubefore) {
 		Ubefore = ubefore;
+	}
+	public static int getWidth() {
+		return WIDTH;
 	}
 }
