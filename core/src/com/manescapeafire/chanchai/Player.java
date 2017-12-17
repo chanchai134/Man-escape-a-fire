@@ -1,13 +1,16 @@
 package com.manescapeafire.chanchai;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class Player {
 	private Vector2 pos;
-	private Texture []img = new Texture[6];//0standR 1stanL 2walR 3walkL 4jumpR 5jumpL
+	private Texture []img = new Texture[10];//0standR 1stanL 234walR 567walkL 8jumpR 9jumpL
 	private int status;
 	private static final int WIDTH = 72;
 	private final int LEFT = -1;
@@ -21,6 +24,11 @@ public class Player {
 	private boolean isOnAir;
 	private WorldGame world;
 	private boolean isGameEnd = false;
+	private char keepKey = '\0';
+	private final Animation runningAnimationR;
+	private final Animation runningAnimationL;
+	private float elapsed_time = 0f;
+	private float FRAME_DURATION = 0.15f;
 	public Player(WorldGame world, float x, float y) {
 		this.world = world;
 		setStatus(0);
@@ -31,45 +39,74 @@ public class Player {
 		pos = new Vector2(x, y);
 		img[0] = new Texture("player_stand_R.png");
 		img[1] = new Texture("player_stand_L.png");
-		img[4] = new Texture("player_jump_R.png");
-		img[5] = new Texture("player_jump_L.png");
+		img[2] = new Texture("player_jump_R.png");
+		img[3] = new Texture("player_jump_L.png");
+		TextureAtlas runningR = new TextureAtlas(Gdx.files.internal("walkR.atlas"));
+        Array<TextureAtlas.AtlasRegion> runningFramesR = runningR.findRegions("walkR");
+        runningAnimationR = new Animation(FRAME_DURATION, runningFramesR, Animation.PlayMode.LOOP);
+        TextureAtlas runningL = new TextureAtlas(Gdx.files.internal("walkL.atlas"));
+        Array<TextureAtlas.AtlasRegion> runningFramesL = runningL.findRegions("walkL");
+        runningAnimationL = new Animation(FRAME_DURATION, runningFramesL, Animation.PlayMode.LOOP);	
 	}
 	public void update() {
 		updateWithKeyboard();
 		autoUpdate();
 	}
 	public void render() {
-		world.game.batch.draw(img[getStatus()], pos.x, pos.y);
+		elapsed_time += Gdx.graphics.getDeltaTime();
+        TextureRegion runningR = (TextureRegion)runningAnimationR.getKeyFrame(elapsed_time);
+        TextureRegion runningL = (TextureRegion)runningAnimationL.getKeyFrame(elapsed_time);
+		if(getStatus() == 4) {
+			world.game.batch.draw(runningR, pos.x, pos.y);
+		}
+		else if(getStatus() == 5) {
+			world.game.batch.draw(runningL, pos.x, pos.y);
+		}
+		else {
+			world.game.batch.draw(img[getStatus()], pos.x, pos.y);
+		}		
 	}
 	public void screenScroll(float speed) {
 		pos.y -= speed;
 	}
 	private void updateWithKeyboard() {
 		if(Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			if(!isOnAir) {
-				setStatus(0);
-			}
-			else {
+			if(!isOnAir && keepKey == 'r') {
 				setStatus(4);
 			}
-			walk(RIGHT);
+			else {
+				setStatus(2);
+			}
+			move(RIGHT);
+			keepKey = 'r';
+		}
+		else {
+			if(keepKey == 'r') {
+				setStatus(0);
+			}
 		}
 		if(Gdx.input.isKeyPressed(Keys.LEFT)) {
 			if(!isOnAir) {
-				setStatus(1);
-			}
-			else {
 				setStatus(5);
 			}
-			walk(LEFT);
+			else {
+				setStatus(3);
+			}
+			move(LEFT);
+			keepKey = 'l';
+		}
+		else {
+			if(keepKey == 'l') {
+				setStatus(1);
+			}
 		}
 		if(Gdx.input.isKeyJustPressed(Keys.UP) && !isOnAir && !isGameEnd) {
 			//System.out.println("start");
-			if(getStatus() == 0) {
-				setStatus(4);
+			if(getStatus() == 0 || getStatus() == 4) {
+				setStatus(2);
 			}
-			else if(getStatus() == 1) {
-				setStatus(5);
+			else if(getStatus() == 1 || getStatus() == 5) {
+				setStatus(3);
 			}			
 			jump();
 			startJump = true;
@@ -104,10 +141,10 @@ public class Player {
 					else if(pos.y == world.getBox()[i][j].getUpper() && !startJump && checkXInRange) {
 						world.getBox()[i][j].setStatePlayer('o');
 						isOnAir = false;
-						if(status == 4) {
+						if(status == 2) {
 							setStatus(0);
 						}
-						if(status == 5) {
+						if(status == 3) {
 							setStatus(1);
 						}
 						setUpresent(0);
@@ -127,7 +164,7 @@ public class Player {
 		startJump = false;
 		//System.out.println(isOnAir);
 	}
-	public void walk(int direction) {
+	public void move(int direction) {
 		pos.x += SPEED*direction;
 	}
 	public void jump() {

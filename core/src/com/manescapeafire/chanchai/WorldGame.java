@@ -231,4 +231,7 @@ public class WorldGame {
 	public void setDelta(float delta) {
 		this.delta = delta;
 	}
+	public float getDelta() {
+		return delta;
+	}
 }
