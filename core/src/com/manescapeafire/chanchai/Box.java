@@ -4,22 +4,26 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 public class Box {
-	private GameFireMan game;
 	private Vector2 pos;
 	private Texture img;
 	public static final int WIDTH = 75;
 	public static final int HEIGH = 40;
 	private float upper;
 	private char statePlayer;//l = lower , h = higher ,o = on the floor//Player is lower than box. 
-	public Box(GameFireMan game, float x, float y) {
-		this.game = game;
+	private WorldGame world;
+	public Box(WorldGame world, float x, float y) {
+		this.world = world;
 		this.statePlayer = 'l';
 		pos = new Vector2(x,y);
 		img = new Texture("ground.png");
 		upper = y+HEIGH;
 	}
 	public void render() {
-		game.batch.draw(img, pos.x, pos.y);
+		world.game.batch.draw(img, pos.x, pos.y);
+	}
+	public void screenScroll(float speed) {
+		pos.y -= speed;
+		upper = pos.y+HEIGH;
 	}
 	public boolean xInRange(float x) {
 		if(pos.x <= x && x < (pos.x+WIDTH)) {
