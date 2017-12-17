@@ -12,9 +12,9 @@ public class Player {
 	private static final int WIDTH = 72;
 	private final int LEFT = -1;
 	private final int RIGHT = 1;
-	private final float SPEED = 5f;
+	private final float SPEED = 5;
 	private final float GRAVITY = -1;
-	private final float JUMPFORCE = 15.1f; //U set on jump
+	private final float JUMPFORCE = 15; //U set on jump
 	private float Upresent;
 	private float Ubefore;
 	private boolean startJump;
