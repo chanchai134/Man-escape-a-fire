@@ -3,10 +3,12 @@ package com.manescapeafire.chanchai;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Intersector;
 
 public class WorldGame {
 	private Player player;
 	private Box [][]box = new Box[13][10];//[y][x]
+	private Coin [][]coin = new Coin[13][10];
 	public GameFireMan game;
 	private float SPEEDSCROLL = 1;
 	private int nextIndexChangeBox = 0;
@@ -14,11 +16,14 @@ public class WorldGame {
 	private BitmapFont scoreText = new BitmapFont();
 	private Fire fire;
 	private float score = 0;
+	private int numberOfCoin = 0;
 	private Wall [][]wall = new Wall[6][4];
 	private float delta;
 	private int status = 0; //0start 1game 2score
 	private ScoreBoard scoreBoard;
-	private BitmapFont scoreBoardText = new BitmapFont();
+	private BitmapFont scoreBoardText1 = new BitmapFont();
+	private BitmapFont scoreBoardText2 = new BitmapFont();
+	private BitmapFont scoreBoardText3 = new BitmapFont();
 	private Welcome welcome;
 	public WorldGame(GameFireMan game) {
 		this.game = game;
@@ -28,10 +33,15 @@ public class WorldGame {
 		welcome = new Welcome(this,145,88);
 		generateBox();
 		generateWall();
+		generateCoin();
 		scoreText.setColor(0, 0, 0, 1);
 		scoreText.getData().setScale(1.5f);
-		scoreBoardText.setColor(0, 0, 0, 1);
-		scoreBoardText.getData().setScale(5f);
+		scoreBoardText1.setColor(0, 0, 0, 1);
+		scoreBoardText1.getData().setScale(2.5f);
+		scoreBoardText2.setColor(0, 0, 0, 1);
+		scoreBoardText2.getData().setScale(2.5f);
+		scoreBoardText3.setColor(0, 0, 0, 1);
+		scoreBoardText3.getData().setScale(2.5f);
 	}
 	public void update() {
 		if(status == 1) {
@@ -60,6 +70,13 @@ public class WorldGame {
 	}
 	private void autoUpdate() {
 		clearScreenAndRegenerate();
+		for(int i = 0 ;i<13 ;i++) {
+			for(int j = 0; j < 10;j++) {
+				if(coin[i][j] != null) {
+					coin[i][j].update();
+				}
+			}
+		}
 		if(player.isGameOver()) {
 			status = 2;
 		}
@@ -69,27 +86,50 @@ public class WorldGame {
 			player.setSpeed(player.getSpeed()+delta/40);
 			player.setJUMPFORCE(player.getJUMPFORCE()+delta/10);
 		}
+		for(int i = 0 ;i<13 ;i++) {
+			for(int j = 0; j < 10;j++) {
+				if(coin[i][j] != null) {
+					if(Intersector.overlaps(player.rectangle,coin[i][j].rectangle)) {
+						coin[i][j] = null;
+						numberOfCoin++;
+					}
+				}
+			}
+		}
 	}
 	public void render() {
 		wallRender();
 		boxRender();
+		coinRender();
 		player.render();
 		fire.render();
 		if(status == 0) {
 			welcome.render();
 		}
 		if(status == 1) {
-			scoreText.draw(game.batch, "Score : "+String.format("%.0f", score), 595, 40);
+			scoreText.draw(game.batch, "Coin : "+ String.valueOf(numberOfCoin) +"     Score : "+String.format("%.0f", score), 495, 40);
 		}
 		if(status == 2) {
 			scoreBoard.render();
-			scoreBoardText.draw(game.batch,String.format("%.0f", score), 290, 500);
+			scoreBoardText1.draw(game.batch,String.format("%.0f", score), 420, 561);
+			scoreBoardText2.draw(game.batch,String.valueOf(numberOfCoin)+" X 10", 420, 493);
+			scoreBoardText3.draw(game.batch,String.format("%.0f", score+numberOfCoin*10), 420, 416);
 		}
 	}
 	private void screenScroll() {
 		scrollAllBox(SPEEDSCROLL);
 		scrollAllWall(SPEEDSCROLL);
+		scrollAllCoin(SPEEDSCROLL);
 		player.screenScroll(SPEEDSCROLL);
+	}
+	private void scrollAllCoin(float speed) {
+		for(int i = 0 ;i<13 ;i++) {
+			for(int j = 0; j < 10;j++) {
+				if(coin[i][j] != null) {
+					coin[i][j].screenScroll(speed);
+				}
+			}
+		}
 	}
 	private void scrollAllWall(float speed) {
 		for(int i = 0; i < 6; i++) {
@@ -118,10 +158,12 @@ public class WorldGame {
 		if(yOfBox+Box.WIDTH < 0) {
 			if(nextIndexChangeBox == 0) {
 				box[nextIndexChangeBox] = generateBoxLine(box[12]);
+				generateCoinLine(12);
 				nextIndexChangeBox += 1;
 			}
 			else {
 				box[nextIndexChangeBox] = generateBoxLine(box[nextIndexChangeBox-1]);
+				generateCoinLine(nextIndexChangeBox-1);
 				if(nextIndexChangeBox == 12) {
 					nextIndexChangeBox = 0;
 				}
@@ -148,6 +190,15 @@ public class WorldGame {
 				}
 				else {
 					nextIndexChangeWall += 1;
+				}
+			}
+		}
+	}
+	private void coinRender() {
+		for(int i = 0 ;i<13 ;i++) {
+			for(int j = 0; j < 10;j++) {
+				if(coin[i][j] != null) {
+					coin[i][j].render();
 				}
 			}
 		}
@@ -184,6 +235,18 @@ public class WorldGame {
 		}
 		box[4][4] = new Box(this, Box.WIDTH*4, Box.HEIGH*2*4); //staring place that player stand
 		box[4][5] = new Box(this, Box.WIDTH*5, Box.HEIGH*2*4); //staring place that player stand
+	}
+	private void generateCoin() {
+		for(int i = 0; i<13; i++) {
+			generateCoinLine(i);
+		}
+	}
+	private void generateCoinLine(int index) {
+		for(int j = 0; j<10; j++) {
+			if(box[index][j] != null && Math.random() > 0.5) {
+					coin[index][j] = new Coin(this, box[index][j].getX()+(Box.WIDTH-Coin.WIDTH)/2, box[index][j].getY()+Box.HEIGH+1);
+			}
+		}
 	}
 	public Box[] generateBoxLine(Box[] down) {
 		Box[] next = new Box[10];

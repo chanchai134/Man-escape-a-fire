@@ -23,6 +23,9 @@ public class Wall {
 	public float getY() {
 		return pos.y;
 	}
+	public float getX() {
+		return pos.x;
+	}
 	public void setY(float y) {
 		pos.y = y;
 	}

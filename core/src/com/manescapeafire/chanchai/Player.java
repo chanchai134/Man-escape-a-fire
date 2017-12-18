@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -12,6 +13,7 @@ public class Player {
 	private Texture []img = new Texture[4];//0standR 1stanL 2jumpR 3jumpL
 	private int status; //use for show texture;
 	private static final int WIDTH = 72;
+	private static final int HEIGH = 129;
 	private final int LEFT = -1;
 	private final int RIGHT = 1;
 	private float speed = 5;
@@ -28,6 +30,7 @@ public class Player {
 	private final Animation runningAnimationL;
 	private float elapsed_time = 0f;
 	private float FRAME_DURATION = 0.15f;
+	public Rectangle rectangle;
 	public Player(WorldGame world, float x, float y) {
 		this.world = world;
 		setStatus(0);
@@ -36,6 +39,7 @@ public class Player {
 		isOnAir = false;
 		startJump = false;
 		pos = new Vector2(x, y);
+		rectangle = new Rectangle(pos.x ,pos.y, WIDTH, HEIGH);
 		/////////////import all texture
 		imageLoad();
 		TextureAtlas runningR = new TextureAtlas(Gdx.files.internal("walkR.atlas"));
@@ -116,6 +120,7 @@ public class Player {
 		}
 	}
 	private void autoUpdate() {
+		rectangle.setPosition(pos.x, pos.y);
 		if(pos.x > (GameFireMan.WIDTH-Box.WIDTH)) {
 			pos.x = (GameFireMan.WIDTH-Box.WIDTH);
 		}
