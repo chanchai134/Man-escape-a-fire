@@ -34,6 +34,12 @@ public class WorldGame {
 		generateBox();
 		generateWall();
 		generateCoin();
+		if(coin[4][4] != null) {
+			coin[4][4] = null;
+		}
+		if(coin[4][5] != null) {
+			coin[4][5] = null;
+		}
 		scoreText.setColor(0, 0, 0, 1);
 		scoreText.getData().setScale(1.5f);
 		scoreBoardText1.setColor(0, 0, 0, 1);
@@ -55,10 +61,19 @@ public class WorldGame {
 				scoreBoard = new ScoreBoard(this,150,184);
 				generateBox();
 				generateWall();
+				clearCoin();
+				generateCoin();
+				if(coin[4][4] != null) {
+					coin[4][4] = null;
+				}
+				if(coin[4][5] != null) {
+					coin[4][5] = null;
+				}
 				SPEEDSCROLL = 1;
 				nextIndexChangeBox = 0;
 				nextIndexChangeWall = 0;
 				score = 0;
+				numberOfCoin = 0;
 			}
 		}
 		else if(status == 0) {
@@ -245,6 +260,13 @@ public class WorldGame {
 		for(int j = 0; j<10; j++) {
 			if(box[index][j] != null && Math.random() > 0.5) {
 					coin[index][j] = new Coin(this, box[index][j].getX()+(Box.WIDTH-Coin.WIDTH)/2, box[index][j].getY()+Box.HEIGH+1);
+			}
+		}
+	}
+	private void clearCoin() {
+		for(int i = 0 ;i<13 ;i++) {
+			for(int j = 0; j < 10;j++) {
+				coin[i][j] = null;
 			}
 		}
 	}
